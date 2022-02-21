@@ -42,7 +42,7 @@ process HISAT2_INDEX_REFERENCE {
 
     script:
     """
-    hisat2-build ${reference} ${reference.baseName} -p ${params.threads} --exons ${exon} --ss ${splice_sites}
+    hisat2-build ${reference} ${reference.baseName} -p ${params.threads} --exon ${exon} --ss ${splice_sites}
     """
 }
 
