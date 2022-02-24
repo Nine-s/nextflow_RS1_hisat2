@@ -52,7 +52,7 @@ process HISAT2_ALIGN {
  
     input:
     tuple val(sample_name), path(reads)
-    path(index)
+    tuple path(reference), path(index)
     path(splice_sites)
     env STRANDNESS
 
