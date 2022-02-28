@@ -26,7 +26,7 @@ workflow {
     FASTP( read_pairs_ch )
     EXTRACT_EXONS( params.reference_annotation )
     EXTRACT_SPLICE_SITES( params.reference_annotation )
-    HISAT2_INDEX_REFERENCE( params.reference_genome, EXTRACT_EXONS.out, EXTRACT_SPLICE_SITES.out )
+    HISAT2_INDEX_REFERENCE( params.reference_genome )
     HISAT2_ALIGN( read_pairs_ch, HISAT2_INDEX_REFERENCE.out, EXTRACT_SPLICE_SITES.out, CHECK_STRANDNESS.out.first() )
     SAMTOOLS( HISAT2_ALIGN.out.sample_sam )
     CUFFLINKS( CHECK_STRANDNESS.out, SAMTOOLS.out.sample_bam, params.reference_annotation )
