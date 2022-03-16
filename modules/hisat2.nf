@@ -32,8 +32,6 @@ process HISAT2_INDEX_REFERENCE {
     label 'hisat2'
     publishDir params.outdir
     memory '50 GB'
-    executor 'k8s'
-
 
     input:
     path(reference)
@@ -50,13 +48,12 @@ process HISAT2_INDEX_REFERENCE {
 }
 
 process HISAT2_ALIGN {
-    label 'star'
+    label 'hisat2'
     publishDir params.outdir
  
     input:
     tuple val(sample_name), path(reads)
     tuple path(reference), path(index)
-    path(splice_sites)
     env STRANDNESS
 
     output:
@@ -66,15 +63,15 @@ process HISAT2_ALIGN {
     '''
     if [[ ($STRANDNESS == "firststrand") ]]; then
     
-        hisat2 -x !{reference.baseName} -1 !{reads[0]} -2 !{reads[1]} --new-summary --summary-file !{sample_name}_summary.log --thread !{params.threads} --dta-cufflinks --known-splicesite-infile !{splice_sites} --rna-strandness FR -S !{sample_name}.sam
+        hisat2 -x !{reference.baseName} -1 !{reads[0]} -2 !{reads[1]} --new-summary --summary-file !{sample_name}_summary.log --thread !{params.threads} --dta-cufflinks --rna-strandness FR -S !{sample_name}.sam
 
     if [[ ($STRANDNESS == "secondstrand") ]]; then
     
-        hisat2 -x !{reference.baseName} -1 !{reads[0]} -2 !{reads[1]} --new-summary --summary-file !{sample_name}_summary.log --thread !{params.threads} --dta-cufflinks --known-splicesite-infile !{splice_sites} --rna-strandness RF -S !{sample_name}.sam
+        hisat2 -x !{reference.baseName} -1 !{reads[0]} -2 !{reads[1]} --new-summary --summary-file !{sample_name}_summary.log --thread !{params.threads} --dta-cufflinks --rna-strandness RF -S !{sample_name}.sam
 
     elif [[ $STRANDNESS == "unstranded" ]]; then
        
-        hisat2 -x !{reference.baseName} -1 !{reads[0]} -2 !{reads[1]} --new-summary --summary-file !{sample_name}_summary.log --thread !{params.threads} --dta-cufflinks --known-splicesite-infile !{splice_sites} -S !{sample_name}.sam
+        hisat2 -x !{reference.baseName} -1 !{reads[0]} -2 !{reads[1]} --new-summary --summary-file !{sample_name}_summary.log --thread !{params.threads} --dta-cufflinks -S !{sample_name}.sam
     else  
 		echo $STRANDNESS > error_strandness.txt
 		echo "strandness cannot be determined" >> error_strandness.txt
