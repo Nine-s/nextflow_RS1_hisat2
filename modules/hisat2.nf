@@ -65,7 +65,7 @@ process HISAT2_ALIGN {
     
         hisat2 -x !{reference.baseName} -1 !{reads[0]} -2 !{reads[1]} --new-summary --summary-file !{sample_name}_summary.log --thread !{params.threads} --dta-cufflinks --rna-strandness FR -S !{sample_name}.sam
 
-    if [[ ($STRANDNESS == "secondstrand") ]]; then
+    elif [[ ($STRANDNESS == "secondstrand") ]]; then
     
         hisat2 -x !{reference.baseName} -1 !{reads[0]} -2 !{reads[1]} --new-summary --summary-file !{sample_name}_summary.log --thread !{params.threads} --dta-cufflinks --rna-strandness RF -S !{sample_name}.sam
 
