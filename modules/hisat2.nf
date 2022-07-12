@@ -46,7 +46,7 @@ process HISAT2_INDEX_REFERENCE {
     """
 }
 
-process HISAT2_ALIGN {
+process HISAT2_ALIGN_def {
     label 'star'
     publishDir params.outdir
  
@@ -65,7 +65,7 @@ process HISAT2_ALIGN {
     
         hisat2 -x !{reference.baseName} -1 !{reads[0]} -2 !{reads[1]} --new-summary --summary-file !{sample_name}_summary.log --thread !{params.threads} --dta-cufflinks --known-splicesite-infile !{splice_sites} --rna-strandness FR -S !{sample_name}.sam
 
-    if [[ ($STRANDNESS == "secondstrand") ]]; then
+    elif [[ ($STRANDNESS == "secondstrand") ]]; then
     
         hisat2 -x !{reference.baseName} -1 !{reads[0]} -2 !{reads[1]} --new-summary --summary-file !{sample_name}_summary.log --thread !{params.threads} --dta-cufflinks --known-splicesite-infile !{splice_sites} --rna-strandness RF -S !{sample_name}.sam
 
@@ -77,5 +77,47 @@ process HISAT2_ALIGN {
 		echo "strandness cannot be determined" >> error_strandness.txt
 	fi
     '''   
+}
+
+process HISAT2_ALIGN {
+    label 'star'
+    publishDir params.outdir
+ 
+    input:
+    tuple val(sample_name), path(reads)
+    tuple path(reference), path(index)
+    path(splice_sites)
+    env STRANDNESS
+
+    output:
+    tuple val(sample_name), path("${sample_name}*.sam"), emit: sample_sam 
+
+    shell:
+    '''
+    if [[ ($STRANDNESS == "firststrand") ]]; then
+    
+        hisat2 -x !{reference.baseName} \
+		-1 !{reads[0]} -2 !{reads[1]} \
+		--new-summary \
+		--summary-file !{sample_name}_summary.log \
+		--thread !{params.threads} \
+		--dta-cufflinks \
+		--rna-strandness FR \
+		-S !{sample_name}.sam
+
+    elif [[ ($STRANDNESS == "secondstrand") ]]; then
+    
+        hisat2 -x !{reference.baseName} -1 !{reads[0]} -2 !{reads[1]} --new-summary --summary-file !{sample_name}_summary.log --thread !{params.threads} --dta-cufflinks --rna-strandness RF -S !{sample_name}.sam
+
+    elif [[ $STRANDNESS == "unstranded" ]]; then
+       
+        hisat2 -x !{reference.baseName} -1 !{reads[0]} -2 !{reads[1]} --new-summary --summary-file !{sample_name}_summary.log --thread !{params.threads} --dta-cufflinks -S !{sample_name}.sam
+    else  
+		echo $STRANDNESS > error_strandness.txt
+		echo "strandness cannot be determined" >> error_strandness.txt
+	fi
+    '''   
    
 }
+   
+

@@ -4,7 +4,7 @@ process CUFFLINKS {
      
     input:
     env STRANDNESS
-    tuple val(sample_name), path(sorted_bam)
+    path(sorted_bam)
     path(annotation)
     
     output:
