@@ -28,7 +28,7 @@ process EXTRACT_SPLICE_SITES {
     """
 }
 
-process HISAT2_INDEX_REFERENCE {
+process HISAT2_INDEX_REFERENCE_ExSp {
     label 'hisat2'
     publishDir params.outdir
 
